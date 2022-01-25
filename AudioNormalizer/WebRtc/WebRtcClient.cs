@@ -9,7 +9,8 @@ namespace WebRtc
 {
     public sealed class WebRtcClient : IDisposable
     {
-        private readonly object _lock = new Object();
+        private readonly object _userDataLock = new();
+        private bool _isConnected = false;
         private Random _rng { get; }
 
         public EventWaitHandle _stopHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
@@ -29,16 +30,16 @@ namespace WebRtc
 
         public Task Connect()
         {
-            Task.Run(RunEmitter);
+            Task.Run(RunSimulation);
 
-            return Task.Delay(_rng.Next(1000));
+            return Task.Delay(_rng.Next(1000)).ContinueWith(t => _isConnected = true);
         }
 
         public Task Disconnect()
         {
             _stopHandle.Set();
 
-            return Task.Delay(_rng.Next(1000));
+            return Task.Delay(_rng.Next(1000)).ContinueWith(t => _isConnected = false);
         }
 
         public void Dispose()
@@ -50,8 +51,11 @@ namespace WebRtc
         {
             return Task.Delay(_rng.Next(1000)).ContinueWith(t =>
             {
-                lock (_lock)
+                lock (_userDataLock)
                 {
+                    if (_isConnected)
+                        throw new InvalidOperationException("WebRtcClient is disconnected");
+
                     return JsonSerializer.Serialize(_userData);
                 }
             });
@@ -65,32 +69,34 @@ namespace WebRtc
         private void NotifyAudioLevelChanged()
         {
             var index = _rng.Next(_userData.Count);
+
             KeyValuePair<string, UserAudioLevel> userDatum;
-            lock (_lock)
+            lock (_userDataLock)
             {
                 userDatum = _userData.ElementAt(index);
             }
 
             var flux = 8;
+            var isTalking = _rng.Next(100) > 25;
+
+            var level = isTalking ? Math.Max(0, Math.Min(100, userDatum.Value.BaseLevel + userDatum.Value.Gain + _rng.Next(-flux, flux))) : 0;
+            userDatum.Value.LastLevel = level;
 
             foreach (var audioProcessor in AudioProcessors)
             {
-                var level = Math.Max(5, Math.Min(100, userDatum.Value.BaseLevel + userDatum.Value.Gain + _rng.Next(-flux, flux)));
-                userDatum.Value.LastLevel = level;
-
                 audioProcessor.OnAudioLevelChanged(userDatum.Key, level);
             }
         }
 
         public void SetUserGain(string userId, double gain)
         {
-            lock (_lock)
+            lock (_userDataLock)
             {
                 _userData[userId].Gain = gain;
             }
         }
 
-        private void RunEmitter()
+        private void RunSimulation()
         {
             while (!_stopHandle.WaitOne(_rng.Next(2000)))
             {

@@ -9,15 +9,16 @@ namespace AudioNormalizer
         static void Main(string[] args)
         {
             using var rtcClient = new WebRtcClient();
-            rtcClient.AudioProcessors.Add(new UserAudioNormalizer());
+            rtcClient.AudioProcessors.Add(new AudioLogger());
+
+            Console.WriteLine("Simulation is running; press <ENTER> to exit.");
 
             Console.WriteLine("Connecting...");
             rtcClient.Connect();
 
-            Console.WriteLine("Press <ENTER> to exit");
             Console.ReadLine();
 
-            // TODO: Display audio report
+            // TASK: Display audio report
         }
     }
 }
