@@ -27,7 +27,7 @@ export default class WebRtcClient {
         this.state = WebRtcClientState.Disconnected;
     }
 
-    public setAudioGain(participantId: number, gain: number) {
+    public setParticipantAudioLevelGain(participantId: number, gain: number) {
         const participant = this.participants[participantId];
         participant.audioLevelGain = gain;
     }
