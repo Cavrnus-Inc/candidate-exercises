@@ -1,4 +1,4 @@
-import { Participant } from "src/components/models";
+import { IParticipant } from "src/components/models";
 import Rng from "../rng";
 import Task from "../tasks";
 
@@ -9,7 +9,7 @@ export default class WebRtcClient {
         ["Rafael", 70],
         ["Donatelo", 30],
     ]);
-    public participants: Participant[] = [];
+    private _participants: IParticipant[] = [];
     public state = WebRtcClientState.Disconnected;
     public onAudioLevelChanged?: (participantId: number, lastAudioLevel: number) => void;
 
@@ -27,15 +27,20 @@ export default class WebRtcClient {
         this.state = WebRtcClientState.Disconnected;
     }
 
+    public getParticipants()
+    {
+        return Array.from(this._participants);
+    }
+
     public setParticipantAudioLevelGain(participantId: number, gain: number) {
-        const participant = this.participants[participantId];
+        const participant = this._participants[participantId];
         participant.audioLevelGain = gain;
     }
 
     private async startSimulation() {
         const names = ["Leonardo", "Rafael", "Donatelo"];
         for (const i in names) {
-            this.participants.push({
+            this._participants.push({
                 id: i as unknown as number,
                 name: names[i],
                 audioLevelGain: 0,
@@ -48,7 +53,7 @@ export default class WebRtcClient {
 
         while (this._simulate) {
             await Task.delay(Rng.next(0, 666));
-            const participant = this.participants[Rng.next(0, this._levels.size)];
+            const participant = this._participants[Rng.next(0, this._levels.size)];
             const isTalking = Rng.next(0, 100) > 25;
             const baseLevel = this._levels.get(participant.name) as number;
             const flux = 8;

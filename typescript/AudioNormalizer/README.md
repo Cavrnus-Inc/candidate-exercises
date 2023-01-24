@@ -3,6 +3,7 @@
 ## Install the dependencies
 
 ```bash
+cd typescript\AudioNormalizer
 yarn
 # or
 npm install
@@ -13,6 +14,10 @@ npm install
 ```bash
 yarn quasar dev
 ```
+
+## TASK : Visualize audio levels
+
+In `src/components/ParticipantView.vue`, the `lastAudioLevel` property is updated as a participant speaks or goes silent. Update the visualization of each participant card to reflect their last audio level and apply a style to show audio's threshold (loud, quiet, normal) 
 
 ## TASK: Normalize audio levels
 

@@ -3,7 +3,7 @@
         <q-card class="my-card">
             <q-img :src="avatar">
                 <div :class="getColorForAudioLevel(lastAudioLevel)">
-                    <b>{{ lastAudioLevel }}</b>
+                    <b>?</b>
                 </div>
                 <div class="text-h5 absolute-bottom text-right">{{ name }}</div>
             </q-img>
@@ -13,6 +13,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+
+enum AudioLevelColor {
+    Silent = "text-blue-grey-11",
+    Loud = "text-red-11",
+    Quiet = "text-yellow-11",
+    Normal = "text-light-green-11"
+}
 
 export default defineComponent({
     name: "ParticipantView",
@@ -28,14 +35,11 @@ export default defineComponent({
         name: {
             type: String,
             required: true,
-        },
+        }
     },
     methods: {
         getColorForAudioLevel(audioLevel: number) {
-            if (audioLevel === 0) return "text-blue-grey-11";
-            if (audioLevel > 60) return "text-red-11";
-            if (audioLevel < 40) return "text-yellow-11";
-            return "text-light-green-11";
+            return AudioLevelColor.Silent;
         },
     },
 });

@@ -23,7 +23,7 @@ export default defineComponent({
     components: { ParticipantView },
     setup() {
         return {
-            participants: store.webRtcClient.participants,
+            participants: store.webRtcClient.getParticipants(),
         };
     },
 });
