@@ -17,10 +17,18 @@ yarn quasar dev
 
 ## TASK : Visualize audio levels
 
-In `src/components/ParticipantView.vue`, the `lastAudioLevel` property is updated as a participant speaks or goes silent. Update the visualization of each participant card to reflect their last audio level and apply a style to show audio's threshold (loud, quiet, normal) 
+In `src/components/ParticipantView.vue`, the `lastAudioLevel` property is updated as a participant speaks or goes silent. Update the visualization of each participant card to reflect their last audio level value and apply a style to color code the audio's threshold.
+
+Loud means the level is greater than 60
+
+Normal means the level is 40 to 60
+
+Quiet means the level is less than 40
+
+Silent means level is 0 (the user is not speaking)
 
 ## TASK: Normalize audio levels
 
-In `src/pages/SessionPage.vue`, use the `onAudioLevelChanged` event handler to calculate audio level gain values so that all users have audio levels within a range of 40 to 60 (out of 100).
+In `src/pages/SessionPage.vue`, use the `onAudioLevelChanged` event handler to calculate audio level gain values so that all users have audio levels within a nortmal range of 40 to 60 (out of 100).
 
 Set a user's audio level gain by calling `setParticipantAudioLevelGain` on the `webRtcClient`.
